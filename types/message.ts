@@ -1,6 +1,6 @@
 export enum MessageRole {
-  User = 'user',
-  Client = 'client',
+  User = "user",
+  Client = "client",
 }
 
 export interface Message {
