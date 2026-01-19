@@ -1,49 +1,63 @@
-import { Message, MessageRole } from "@/types/message";
-import { StyleSheet, Text, View } from "react-native";
+import { Colors } from "@/constants/Colors";
+import { type Message, MessageRole } from "@/types/message";
+import { formatMessageTime } from "@/utils/date";
+import { View, type ViewProps, XStack, YStack } from "tamagui";
+import Avatar from "./Avatar";
+import { Paragraph1, Paragraph3 } from "./Text";
 
-const MessageItem = ({ message }: { message: Message }) => {
+interface MessageItemProps extends ViewProps {
+  message: Message;
+  showAvatar?: boolean;
+  showTimestamp?: boolean;
+  avatarUrl?: string;
+  avatarInitials?: string;
+}
+
+export default function MessageItem({
+  message,
+  showAvatar = true,
+  showTimestamp = true,
+  avatarUrl,
+  avatarInitials,
+  ...props
+}: MessageItemProps) {
+  const isUser = message.role === MessageRole.User;
+
+  function renderAvatar() {
+    if (!showAvatar) {
+      return <View width={28} />;
+    }
+
+    return <Avatar size={28} avatarUrl={avatarUrl} avatarInitials={avatarInitials} />;
+  }
+
   return (
-    <View
-      style={[styles.container, message.role === MessageRole.User ? styles.right : styles.left]}
+    <XStack
+      justifyContent={isUser ? "flex-end" : "flex-start"}
+      alignItems="flex-end"
+      gap={4}
+      {...props}
     >
-      <Text
-        style={[
-          styles.text,
-          message.role === MessageRole.User ? styles.textRight : styles.textLeft,
-        ]}
-      >
-        {message.content}
-      </Text>
-    </View>
+      {!isUser && renderAvatar()}
+
+      <View maxWidth="75%" alignItems={isUser ? "flex-end" : "flex-start"}>
+        <YStack
+          paddingHorizontal={16}
+          paddingVertical={12}
+          borderRadius={20}
+          backgroundColor={isUser ? Colors.green5 : Colors.primary5}
+          gap={4}
+        >
+          <Paragraph1>{message.content}</Paragraph1>
+          {showTimestamp && (
+            <Paragraph3 color={Colors.primary60} textAlign={isUser ? "right" : "left"}>
+              {formatMessageTime(message.createdAt)}
+            </Paragraph3>
+          )}
+        </YStack>
+      </View>
+
+      {isUser && renderAvatar()}
+    </XStack>
   );
-};
-
-const styles = StyleSheet.create({
-  container: {
-    padding: 16,
-    borderRadius: 16,
-    backgroundColor: "#fff",
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
-  },
-  left: {
-    marginRight: "auto",
-    backgroundColor: "#fdfdfd",
-  },
-  right: {
-    marginLeft: "auto",
-    backgroundColor: "#007bff",
-  },
-  text: {
-    fontSize: 16,
-    fontWeight: "400",
-  },
-  textLeft: {
-    color: "#000",
-  },
-  textRight: {
-    color: "#fff",
-  },
-});
-
-export default MessageItem;
+}

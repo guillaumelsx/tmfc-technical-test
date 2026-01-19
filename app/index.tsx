@@ -1,151 +1,59 @@
-import React, { useState } from "react";
-import {
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  StatusBar,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
-
+import ChatHeader from "@/components/ChatHeader";
+import ChatInput from "@/components/ChatInput";
 import MessageItem from "@/components/MessageItem";
-import { Message, MessageRole } from "@/types/message";
-import { hapticImpact } from "@/utils/haptics";
+import { Colors } from "@/constants/Colors";
+import { mockClient } from "@/constants/client";
+import { useChatMessages } from "@/hooks/useChatMessages";
 import { FlashList } from "@shopify/flash-list";
-import { ImpactFeedbackStyle } from "expo-haptics";
-import { useSafeAreaInsets } from "react-native-safe-area-context";
-
-const initialMessages: Message[] = [
-  {
-    id: "1",
-    role: MessageRole.User,
-    content: "Hello, how are you?",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-  {
-    id: "2",
-    role: MessageRole.Client,
-    content: "I am good, thank you!",
-    createdAt: new Date().toISOString(),
-    updatedAt: new Date().toISOString(),
-  },
-];
+import { useState } from "react";
+import { StatusBar } from "react-native";
+import { View } from "tamagui";
 
 export default function ChatScreen() {
-  const insets = useSafeAreaInsets();
-
   const [text, setText] = useState("");
-  const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const { messages, addMessage, getMessageProps } = useChatMessages(mockClient);
+  const [inputContainerHeight, setInputContainerHeight] = useState(0);
 
-  const addMessage = () => {
-    setMessages([
-      ...messages,
-      {
-        id: Math.random().toString(36),
-        role: MessageRole.User,
-        content: text,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      },
-    ]);
+  function handleSend() {
+    addMessage(text);
     setText("");
-  };
+  }
 
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === "ios" ? "padding" : "height"}
-      keyboardVerticalOffset={(Platform.OS === "ios" ? insets.top : 0) + 16}
-    >
+    <View flex={1}>
       <StatusBar barStyle="dark-content" />
 
-      <View style={styles.content}>
+      <ChatHeader client={mockClient} />
+
+      <View flex={1} backgroundColor={Colors.white}>
         <FlashList
           data={messages}
-          renderItem={({ item }) => <MessageItem message={item} />}
+          renderItem={({ item, index }) => (
+            <MessageItem message={item} {...getMessageProps(item, index)} />
+          )}
           keyExtractor={(item) => item.id}
-          style={styles.list}
-          contentContainerStyle={styles.listContent}
+          style={{ flex: 1 }}
+          contentContainerStyle={{
+            paddingHorizontal: 16,
+            paddingBottom: inputContainerHeight + 8,
+          }}
           maintainVisibleContentPosition={{
             autoscrollToBottomThreshold: 0.2,
             startRenderingFromBottom: true,
           }}
-          keyboardDismissMode="on-drag"
-          keyboardShouldPersistTaps="handled"
+          // keyboardDismissMode="on-drag"
+          keyboardShouldPersistTaps="always" // tapping outside the input will not dismiss the keyboard
+          showsVerticalScrollIndicator={false}
         />
       </View>
 
-      <View style={[styles.inputContainer, { paddingBottom: insets.bottom + 16 }]}>
-        <TextInput
-          style={styles.input}
-          placeholder="Type your message..."
-          placeholderTextColor="#888"
-          value={text}
-          onChangeText={setText}
-        />
-        <Pressable
-          style={styles.button}
-          onPress={addMessage}
-          onPressIn={() => hapticImpact(ImpactFeedbackStyle.Light)}
-        >
-          <Text style={styles.buttonText}>Send</Text>
-        </Pressable>
-      </View>
-    </KeyboardAvoidingView>
+      <ChatInput
+        text={text}
+        onChangeText={setText}
+        onSend={handleSend}
+        placeholder={`Text ${mockClient.name.split(" ")[0]}`}
+        onLayout={(event) => setInputContainerHeight(event.nativeEvent.layout.height)}
+      />
+    </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    width: "100%",
-    flex: 1,
-  },
-  content: {
-    width: "100%",
-    flex: 1,
-  },
-  inputContainer: {
-    padding: 16,
-    backgroundColor: "#fff",
-    borderWidth: 1,
-    borderBottomWidth: 0,
-    borderColor: "#e0e0e0",
-    borderRadius: 16,
-    gap: 8,
-    flexDirection: "row",
-  },
-  button: {
-    backgroundColor: "#FFE016",
-    height: 40,
-    justifyContent: "center",
-    paddingHorizontal: 24,
-    borderRadius: 8,
-  },
-  buttonPressed: {
-    transform: [{ translateY: 1 }],
-    opacity: 0.8,
-  },
-  buttonText: {
-    color: "#002C2A",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  list: {
-    flex: 1,
-    height: "100%",
-  },
-  listContent: {
-    padding: 16,
-  },
-  input: {
-    height: 40,
-    flex: 1,
-    borderWidth: 1,
-    borderColor: "#e0e0e0",
-    borderRadius: 8,
-    paddingHorizontal: 16,
-  },
-});
