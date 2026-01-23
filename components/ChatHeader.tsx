@@ -3,6 +3,7 @@ import Avatar from "@/components/Avatar";
 import { Heading5, Paragraph3 } from "@/components/Text";
 import { Colors } from "@/constants/Colors";
 import { Client } from "@/types/client";
+import { LayoutChangeEvent } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { View, XStack, YStack } from "tamagui";
 
@@ -10,9 +11,15 @@ interface ChatHeaderProps {
   client: Client;
   onBackPress?: () => void;
   onCallPress?: () => void;
+  onLayout?: (event: LayoutChangeEvent) => void;
 }
 
-export default function ChatHeader({ client, onBackPress, onCallPress }: ChatHeaderProps) {
+export default function ChatHeader({
+  client,
+  onBackPress,
+  onCallPress,
+  onLayout,
+}: ChatHeaderProps) {
   const { top: topInset } = useSafeAreaInsets();
 
   return (
@@ -25,6 +32,7 @@ export default function ChatHeader({ client, onBackPress, onCallPress }: ChatHea
       backgroundColor={Colors.white}
       boxShadow="0 2px 24px 0 rgba(0, 44, 42, 0.08)"
       zIndex={1}
+      onLayout={onLayout}
     >
       <HeaderButton icon={<ChevronLeft />} onPress={onBackPress} />
 
