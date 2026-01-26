@@ -201,7 +201,7 @@ export default function ChatInput({
               scrollEnabled={isExpandedState}
             />
 
-            <InputActions onSend={onSend} disabled={!text.trim()} />
+            <InputActionsRow onSend={onSend} disabled={!text.trim()} />
           </Animated.View>
         </GestureDetector>
 
@@ -211,18 +211,18 @@ export default function ChatInput({
   );
 }
 
-function InputActions({ onSend, disabled }: { onSend: () => void; disabled: boolean }) {
+function InputActionsRow({ onSend, disabled }: { onSend: () => void; disabled: boolean }) {
   return (
     <XStack justifyContent="flex-end" alignItems="center" gap={8}>
       <Circle
         size={36}
-        backgroundColor={Colors.primary5}
+        backgroundColor={disabled ? "transparent" : Colors.primary5}
         hitSlop={4}
         onPress={onSend}
         onPressIn={() => hapticImpact(ImpactFeedbackStyle.Light)}
         disabled={disabled}
       >
-        <ArrowUp />
+        <ArrowUp color={disabled ? Colors.primary50 : Colors.primary100} />
       </Circle>
     </XStack>
   );
