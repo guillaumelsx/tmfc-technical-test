@@ -8,11 +8,12 @@ React Native/Expo chat application (mfc-ai-chat) - a technical test for chat UI 
 
 ## Commands
 
-- `npm start` - Start Expo dev server
+- `npm start` - Start Expo dev server (requires dev client, not Expo Go)
 - `npm run ios` - Build and run on iOS
 - `npm run android` - Build and run on Android
 - `npm run web` - Start web version
 - `npm run lint` - Lint with ESLint
+- `npm run lint:fix` - Auto-fix lint issues
 
 No test commands are configured.
 
@@ -30,7 +31,7 @@ Main screen is `app/index.tsx` (chat screen).
 
 **Animation**: React Native Reanimated with worklet directives for native thread execution. The `useGradualAnimation` hook tracks keyboard height for smooth input animations.
 
-**Gesture Handling**: Pan gestures on ChatInput trigger expand/collapse/dismiss states. Uses `scheduleOnRN` to bridge worklet context to JS thread.
+**Gesture Handling**: Pan gestures on ChatInput trigger expand/collapse/dismiss states. Uses `scheduleOnRN` from `react-native-worklets` to bridge worklet context to JS thread. Gestures use `Gesture.Exclusive()` to prioritize pan over tap.
 
 **Message Grouping**: Messages from the same sender are grouped - avatars/timestamps shown only at group boundaries.
 
@@ -61,5 +62,6 @@ assets/icons/ - SVG icon components
 ## Configuration
 
 - **TypeScript**: Strict mode, path alias `@/*` for project root
-- **ESLint**: Flat config with expo preset and React Compiler plugin
-- **Expo**: New Architecture enabled, React Compiler enabled, typed routes
+- **ESLint**: Flat config with expo preset, React Compiler plugin, and Prettier integration
+- **Prettier**: Double quotes, 100 char line width, trailing commas everywhere
+- **Expo**: New Architecture enabled, React Compiler enabled, typed routes, edge-to-edge on Android
