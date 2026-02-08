@@ -12,7 +12,6 @@ import { View } from "tamagui";
 export default function ChatScreen() {
   const [text, setText] = useState("");
   const { messages, addMessage, getMessageProps } = useChatMessages(mockClient);
-  const [headerHeight, setHeaderHeight] = useState(0);
   const [inputContainerHeight, setInputContainerHeight] = useState(0);
 
   function handleSend() {
@@ -24,10 +23,7 @@ export default function ChatScreen() {
     <View flex={1}>
       <StatusBar barStyle="dark-content" />
 
-      <ChatHeader
-        client={mockClient}
-        onLayout={(event) => setHeaderHeight(event.nativeEvent.layout.height)}
-      />
+      <ChatHeader client={mockClient} />
 
       <View flex={1} backgroundColor={Colors.white}>
         <FlashList
@@ -57,7 +53,6 @@ export default function ChatScreen() {
         onSend={handleSend}
         placeholder={`Text ${mockClient.name.split(" ")[0]}`}
         onLayout={(event) => setInputContainerHeight(event.nativeEvent.layout.height)}
-        headerHeight={headerHeight}
       />
     </View>
   );
