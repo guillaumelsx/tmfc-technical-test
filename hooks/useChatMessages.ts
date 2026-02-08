@@ -7,7 +7,22 @@ import { useState } from "react";
 
 const USER_AVATAR_URL = "https://avatars.githubusercontent.com/u/43066859";
 
-export function useChatMessages(client: Client) {
+export interface UseChatMessagesResult {
+  messages: Message[];
+  addMessage: (content: string) => void;
+  getMessageProps: (
+    message: Message,
+    index: number,
+  ) => {
+    showAvatar: boolean;
+    showTimestamp: boolean;
+    avatarUrl?: string;
+    avatarInitials?: string;
+    marginTop: number;
+  };
+}
+
+export function useChatMessages(client: Client): UseChatMessagesResult {
   const [messages, setMessages] = useState<Message[]>(initialMessages);
 
   function addMessage(content: string) {
