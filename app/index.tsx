@@ -4,6 +4,7 @@ import ChatMessagesList from "@/components/ChatMessagesList";
 import { mockClient } from "@/constants/client";
 import { Colors } from "@/constants/Colors";
 import { useChatMessages } from "@/hooks/useChatMessages";
+import { useGradualAnimation } from "@/hooks/useGradualAnimation";
 import { useState } from "react";
 import { StatusBar } from "react-native";
 import { View } from "tamagui";
@@ -12,6 +13,7 @@ export default function ChatScreen() {
   const [text, setText] = useState("");
   const { messages, addMessage, getMessageProps } = useChatMessages(mockClient);
   const [inputContainerHeight, setInputContainerHeight] = useState(0);
+  const { height: keyboardHeight } = useGradualAnimation();
 
   function handleSend() {
     addMessage(text);
@@ -28,7 +30,9 @@ export default function ChatScreen() {
         <ChatMessagesList
           messages={messages}
           getMessageProps={getMessageProps}
-          contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: inputContainerHeight + 8 }}
+          keyboardHeight={keyboardHeight}
+          inputContainerHeight={inputContainerHeight}
+          contentContainerStyle={{ paddingHorizontal: 16 }}
         />
       </View>
 
@@ -38,6 +42,7 @@ export default function ChatScreen() {
         onSend={handleSend}
         placeholder={`Text ${mockClient.name.split(" ")[0]}`}
         onLayout={(event) => setInputContainerHeight(event.nativeEvent.layout.height)}
+        keyboardHeight={keyboardHeight}
       />
     </View>
   );

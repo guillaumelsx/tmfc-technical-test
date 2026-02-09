@@ -1,8 +1,7 @@
-import { useGradualAnimation } from "@/hooks/useGradualAnimation";
 import { BlurView } from "expo-blur";
 import { LinearGradient } from "expo-linear-gradient";
 import { LayoutChangeEvent, StyleSheet } from "react-native";
-import Animated, { useAnimatedStyle } from "react-native-reanimated";
+import Animated, { type SharedValue, useAnimatedStyle } from "react-native-reanimated";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { View } from "tamagui";
 import InputActionsRow from "./InputActionsRow";
@@ -14,7 +13,10 @@ interface MessageInputProps {
   onSend: () => void;
   placeholder?: string;
   onLayout?: (event: LayoutChangeEvent) => void;
+  keyboardHeight: SharedValue<number>;
 }
+
+const KEYBOARD_GAP = 8;
 
 export default function ChatInput({
   text,
@@ -22,15 +24,16 @@ export default function ChatInput({
   onSend,
   placeholder = "Text message",
   onLayout,
+  keyboardHeight,
 }: MessageInputProps) {
   const { bottom: bottomInset } = useSafeAreaInsets();
-  const { height: keyboardHeight } = useGradualAnimation();
 
   const fakeView = useAnimatedStyle(() => {
+    const keyboardOffset = Math.max(keyboardHeight.value - bottomInset + KEYBOARD_GAP, 0);
     return {
-      height: Math.abs(keyboardHeight.value) - bottomInset + 8,
+      height: keyboardOffset,
     };
-  }, []);
+  }, [bottomInset]);
 
   return (
     <>
@@ -45,21 +48,14 @@ export default function ChatInput({
       </View>
 
       {/* Input Container */}
-      <View
-        width="100%"
-        position="absolute"
-        bottom={0}
-        zIndex={2}
-        paddingTop={8}
-        paddingHorizontal={16}
-        paddingBottom={bottomInset}
-        onLayout={onLayout}
-      >
-        <InteractiveTextInput value={text} placeholder={placeholder} onChangeText={onChangeText}>
-          <InputActionsRow disabled={!text.trim()} onSend={onSend} />
-        </InteractiveTextInput>
+      <View width="100%" position="absolute" bottom={0} zIndex={2}>
+        <View paddingTop={8} paddingHorizontal={16} paddingBottom={bottomInset} onLayout={onLayout}>
+          <InteractiveTextInput value={text} placeholder={placeholder} onChangeText={onChangeText}>
+            <InputActionsRow disabled={!text.trim()} onSend={onSend} />
+          </InteractiveTextInput>
+        </View>
 
-        <Animated.View style={[fakeView]} />
+        <Animated.View style={fakeView} />
       </View>
     </>
   );
