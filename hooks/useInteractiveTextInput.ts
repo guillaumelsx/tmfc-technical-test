@@ -1,10 +1,13 @@
 import { TextInput } from "react-native";
 import { Gesture } from "react-native-gesture-handler";
 import { KeyboardController, useKeyboardState } from "react-native-keyboard-controller";
-import { useSharedValue } from "react-native-reanimated";
+import { type SharedValue, useSharedValue } from "react-native-reanimated";
 import { scheduleOnRN } from "react-native-worklets";
 
-export default function useInteractiveTextInput(inputRef: React.RefObject<TextInput | null>) {
+export default function useInteractiveTextInput(
+  inputRef: React.RefObject<TextInput | null>,
+  isExpanded: SharedValue<boolean>,
+) {
   const { isVisible: isKeyboardVisible } = useKeyboardState();
   const hasTriggeredGesture = useSharedValue(false);
 
@@ -28,10 +31,14 @@ export default function useInteractiveTextInput(inputRef: React.RefObject<TextIn
         hasTriggeredGesture.value = true;
         if (!isKeyboardVisible) {
           scheduleOnRN(handleFocus);
+        } else if (!isExpanded.value) {
+          isExpanded.value = true;
         }
       } else if (isSwipeDown) {
         hasTriggeredGesture.value = true;
-        if (isKeyboardVisible) {
+        if (isExpanded.value) {
+          isExpanded.value = false;
+        } else if (isKeyboardVisible) {
           scheduleOnRN(handleDismiss);
         }
       }

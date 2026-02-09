@@ -13,6 +13,7 @@ export default function ChatScreen() {
   const [text, setText] = useState("");
   const { messages, addMessage, getMessageProps } = useChatMessages(mockClient);
   const [inputContainerHeight, setInputContainerHeight] = useState(0);
+  const [headerHeight, setHeaderHeight] = useState(0);
   const { height: keyboardHeight } = useGradualAnimation();
 
   function handleSend() {
@@ -24,7 +25,9 @@ export default function ChatScreen() {
     <View flex={1}>
       <StatusBar barStyle="dark-content" />
 
-      <ChatHeader client={mockClient} />
+      <View onLayout={(e) => setHeaderHeight(e.nativeEvent.layout.height)}>
+        <ChatHeader client={mockClient} />
+      </View>
 
       <View flex={1} backgroundColor={Colors.white}>
         <ChatMessagesList
@@ -43,6 +46,7 @@ export default function ChatScreen() {
         placeholder={`Text ${mockClient.name.split(" ")[0]}`}
         onLayout={(event) => setInputContainerHeight(event.nativeEvent.layout.height)}
         keyboardHeight={keyboardHeight}
+        headerHeight={headerHeight}
       />
     </View>
   );
