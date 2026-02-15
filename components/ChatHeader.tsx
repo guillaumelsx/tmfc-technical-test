@@ -3,8 +3,10 @@ import Avatar from "@/components/Avatar";
 import { Heading5, Paragraph3 } from "@/components/Text";
 import { Colors } from "@/constants/Colors";
 import { Client } from "@/types/client";
+import { GlassView } from "expo-glass-effect";
+import { StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
-import { View, XStack, YStack } from "tamagui";
+import { XStack, YStack } from "tamagui";
 
 interface ChatHeaderProps {
   client: Client;
@@ -52,8 +54,18 @@ export default function ChatHeader({ client, onBackPress, onCallPress }: ChatHea
 
 function HeaderButton({ icon, onPress }: { icon: React.ReactNode; onPress?: () => void }) {
   return (
-    <View width={44} height={44} justifyContent="center" alignItems="center" onPress={onPress}>
+    <GlassView isInteractive style={styles.headerButton} onTouchEnd={onPress}>
       {icon}
-    </View>
+    </GlassView>
   );
 }
+
+const styles = StyleSheet.create({
+  headerButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: "center",
+    alignItems: "center",
+  },
+});
