@@ -1,14 +1,12 @@
 import { Colors } from "@/constants/Colors";
 import useInteractiveTextInput from "@/hooks/useInteractiveTextInput";
 import { BlurView } from "expo-blur";
-import { GlassView } from "expo-glass-effect";
 import { LinearGradient } from "expo-linear-gradient";
 import { useCallback, useRef, useState } from "react";
 import { LayoutChangeEvent, StyleSheet, TextInput, useWindowDimensions } from "react-native";
 import { GestureDetector } from "react-native-gesture-handler";
 import Animated, {
   Easing,
-  interpolateColor,
   type SharedValue,
   useAnimatedReaction,
   useAnimatedStyle,
@@ -19,8 +17,6 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { scheduleOnRN } from "react-native-worklets";
 import { View } from "tamagui";
 import InputActionsRow from "./InputActionsRow";
-
-const AnimatedGlassView = Animated.createAnimatedComponent(GlassView);
 
 const INPUT_LINE_HEIGHT = 19;
 const MAX_COLLAPSED_LINES = 6;
@@ -132,14 +128,6 @@ export default function ChatInput({
     top: containerTop.value,
   }));
 
-  const glassOverlayStyle = useAnimatedStyle(() => ({
-    backgroundColor: interpolateColor(
-      expandProgress.value,
-      [0, 1],
-      ["rgba(255, 255, 255, 0)", "rgba(255, 255, 255, 1)"],
-    ),
-  }));
-
   const fakeView = useAnimatedStyle(() => {
     const keyboardOffset = Math.max(keyboardHeight.value - bottomInset + KEYBOARD_GAP, 0);
     return {
@@ -185,10 +173,7 @@ export default function ChatInput({
           flex={expanded ? 1 : undefined}
         >
           <GestureDetector gesture={gesture}>
-            <AnimatedGlassView
-              isInteractive
-              style={[styles.container, glassOverlayStyle, expanded && { flex: 1 }]}
-            >
+            <Animated.View style={[styles.container, expanded && { flex: 1 }]}>
               <TextInput
                 ref={inputRef}
                 placeholder={placeholder}
@@ -201,7 +186,7 @@ export default function ChatInput({
                 multiline={true}
               />
               <InputActionsRow disabled={!text.trim()} onSend={onSend} />
-            </AnimatedGlassView>
+            </Animated.View>
           </GestureDetector>
         </View>
 
@@ -215,13 +200,13 @@ const styles = StyleSheet.create({
   container: {
     width: "100%",
     borderRadius: 24,
-    // borderWidth: 1,
+    borderWidth: 1,
     paddingTop: 24,
     paddingHorizontal: 12,
     paddingBottom: 8,
     gap: 12,
-    // backgroundColor: Colors.white,
-    // borderColor: Colors.white,
+    backgroundColor: Colors.white,
+    borderColor: Colors.white,
     boxShadow: "0 2px 24px 0 rgba(0, 44, 42, 0.08)",
   },
   input: {
