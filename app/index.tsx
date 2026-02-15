@@ -17,7 +17,10 @@ export default function ChatScreen() {
   const { height: keyboardHeight } = useGradualAnimation();
 
   function handleSend() {
-    addMessage(text);
+    const trimmed = text.trim();
+    if (!trimmed) return;
+
+    addMessage(trimmed);
     setText("");
   }
 
