@@ -55,3 +55,9 @@ npx expo start --android
 ├── hooks/              # Custom React hooks
 └── utils/              # Utility functions and helpers
 ```
+
+## Product Strategy
+
+The full product strategy analysis is available here:
+
+👉 [Product Strategy & Experience Evolution](./PRODUCT_STRATEGY.md)
